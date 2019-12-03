@@ -157,3 +157,28 @@ input[type=number]::-webkit-inner-spin-button {
           opacity: 0;
       }
   }
+
+  ul {
+      overflow: auto;
+      list-style-type: none;
+  }
+
+  li {
+      height: 4rem;
+      font-size: 4rem;
+      float: left;
+      margin-right: 0px;
+      border-right: 1px solid #aaa;
+      padding: 0 20px;
+  }
+
+li:last-child {
+    border-right:none;
+}
+
+input {
+    font: 2.4rem/1.1 clarendonLight, Georgia;
+    border: none;
+    background: transparent;
+    color: white;
+}
