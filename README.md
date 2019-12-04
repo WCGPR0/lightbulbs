@@ -13,8 +13,10 @@ There are 100 light bulbs lined up in a row in a long room. Each bulb has its ow
 
 ### Attempted Solution
 
-When finding how many lightbulbs are on after 100 people have passed the room, it seems that using the properties of square numbers - in that, they have an odd number of unique factors. And hence, because there are 10 square numbers between 1 and 100, 10 light bulbs are on. However since, the second part of the questions specifically asks which light bulbs are still illuminated, I ended up going for a brute force approach.
+The standard idea was just the brute force approach, in which you build up the light bulbs, m, and cycle through for each person, n. The big O would then be, O(m/1 + m/2 + m/3... + m/n), which becomes O(m H<sub>n</sub>), or approximately O(m ln(n)).
 
-In addition, the results are cached, so that when the input gets changed, it can continue from the closest entry point instead of having to start from scratch again.
+To improve performance, the results are being cached, so that when the input gets changed, it can continue from the closest entry point instead of having to start from scratch again.
+
+The optimized idea (not yet implemented) is to use the properties of square numbers - in that, they have an odd number of unique factors. This would result in the big O(Sqrt(k)). However this only would be applicable under the constraints of when the number of lightbulbs, k, is the same as the number of people, k.
 
 The experimental idea (not yet implemented) is to capitalize in the event that these calculations are independent, and hence could be done in parallel. IE. 1-10, 2-20, 3-30, etc. could be done in different threads, and the results are joined together using the XOR operator. Definitely not a purist approach, but this could be even more capitalized by treating the client as a thread, and having some of the work done by the client and the rest done by the server, and getting the results merged.
