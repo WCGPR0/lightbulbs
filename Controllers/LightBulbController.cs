@@ -23,7 +23,7 @@ namespace lightbulbs.Controllers
             else {
                 lightbulbs = cachedBulb[people];
                 if (lightbulbs == null) {
-                    KeyValuePair<int, Lightbulbs> closestMatch = cachedBulb.Where(x => x.Key < people).OrderBy(x => Math.Abs(x.Key - people)).First();
+                    KeyValuePair<int, Lightbulbs> closestMatch = cachedBulb.Where(x => x.Key < people).OrderBy(x => Math.Abs(x.Key - people)).FirstOrDefault();
                     lightbulbs = MakeLightbulbs(closestMatch, people);
                     cachedBulb[people] = lightbulbs;
                 }
@@ -35,39 +35,35 @@ namespace lightbulbs.Controllers
             Calculate lightbulbs state from a previous cached lightbulbs point
         */
         private Lightbulbs MakeLightbulbs(KeyValuePair<int, Lightbulbs> closestMatch, int people) {
-            Lightbulbs lightbulbs = closestMatch.Value;
-            int numOfLightbulbs = lightbulbs.bulbs.Count();
-            for (int i = closestMatch.Key + 1; i <= people; i++) {
-                int people_ = i;
-                while (people_ < numOfLightbulbs) {
-                    lightbulbs.bulbs[people_] ^= true;
-                    people_ += i;
-                }
-            }
+            Lightbulbs lightbulbs = new Lightbulbs(closestMatch.Value);
+            AdjustLightbulbs(ref lightbulbs, people, closestMatch.Key + 1);
             return lightbulbs;
         }
         /**
             Calculate lightbulbs state from scratch
         */
         private Lightbulbs MakeLightbulbs(int numOfLightbulbs, int people) {
-            Lightbulbs lightbulbs = new Lightbulbs();
-            lightbulbs.bulbs = new bool[numOfLightbulbs]; //By default, all bulbs will be false / switched off
-            for (int i = 1; i <= people; i++) {
+            Lightbulbs lightbulbs = new Lightbulbs(numOfLightbulbs);
+            AdjustLightbulbs(ref lightbulbs, people);
+            return lightbulbs;
+        }
+        private void AdjustLightbulbs(ref Lightbulbs lightbulbs, int people, int start = 1) {
+            int numOfLightbulbs = lightbulbs.bulbs.Count();
+            for (int i = start; i <= people; i++) {
                 int people_ = i;
                 while (people_ < numOfLightbulbs) {
                     lightbulbs.bulbs[people_] ^= true;
                     people_ += i;
                 }
             }
-            lightbulbs.bulbsOn = lightbulbs.bulbs.Count( lb => lb); //Sets the number of bulbs that are true / switched on
-            return lightbulbs;
+            lightbulbs.bulbsOn = lightbulbs.bulbs.Count( lb => lb ); //Sets the number of bulbs that are true / switched on;
         }
 
         public class Lightbulbs {
             public int bulbsOn { get; set; } //< Number of lightbulbs that are switched on
             public bool[] bulbs { get; set; } //< The state of the lightbulbs
-            public Lightbulbs() {
-
+            public Lightbulbs(int numOfLightbulbs) {
+                bulbs = new bool[numOfLightbulbs]; //By default, all bulbs will be false / switched off
             }
             // Copy Constructor
             public Lightbulbs(Lightbulbs lightbulbs) {
