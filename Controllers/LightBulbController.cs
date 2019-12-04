@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.Caching;
 
 namespace lightbulbs.Controllers
 {
     [Route("api/[controller]")]
     public class LightBulbController : Controller
     {
-        private System.Runtime.Caching.MemoryCache cache = new System.Runtime.Caching.MemoryCache("LightBulbsCache");
+        private MemoryCache cache = MemoryCache.Default;
+        private const double MINUTES_TILL_EXPIRATION = 5.0;
 
         [HttpGet("[action]")]
         public Lightbulbs GetLightBulbs(int numOfLightbulbs, int people) {
@@ -16,15 +18,18 @@ namespace lightbulbs.Controllers
             Lightbulbs lightbulbs = null;
             if (cachedBulb == null) {
                 cachedBulb = new SortedDictionary<int, Lightbulbs>();
-                cache[numOfLightbulbs.ToString()] = cachedBulb;
+                CacheItemPolicy policy = new CacheItemPolicy();
+                policy.AbsoluteExpiration = DateTime.Now.AddMinutes(MINUTES_TILL_EXPIRATION);
+                cache.Set(numOfLightbulbs.ToString(), cachedBulb, policy);
                 lightbulbs = MakeLightbulbs(numOfLightbulbs, people);
                 cachedBulb[people] = lightbulbs;
             }
             else {
-                lightbulbs = cachedBulb[people];
-                if (lightbulbs == null) {
+                if (cachedBulb.ContainsKey(people))
+                    lightbulbs = cachedBulb[people];
+                else {
                     KeyValuePair<int, Lightbulbs> closestMatch = cachedBulb.Where(x => x.Key < people).OrderBy(x => Math.Abs(x.Key - people)).FirstOrDefault();
-                    lightbulbs = MakeLightbulbs(closestMatch, people);
+                    lightbulbs = closestMatch.Value == null ? MakeLightbulbs(numOfLightbulbs, people) : MakeLightbulbs(closestMatch, people);
                     cachedBulb[people] = lightbulbs;
                 }
             }
@@ -55,7 +60,7 @@ namespace lightbulbs.Controllers
         private void AdjustLightbulbs(ref Lightbulbs lightbulbs, int people, int start = 1) {
             int numOfLightbulbs = lightbulbs.bulbs.Count();
             for (int i = start; i <= people; i++) {
-                int people_ = i;
+                int people_ = i - 1;
                 while (people_ < numOfLightbulbs) {
                     lightbulbs.bulbs[people_] ^= true;
                     people_ += i;
@@ -68,9 +73,8 @@ namespace lightbulbs.Controllers
         private void AdjustLightbulbsOptimized(ref Lightbulbs lightbulbs, int people) {
             int numOfLightbulbs = lightbulbs.bulbs.Count();
             Array.Clear(lightbulbs.bulbs, 0, lightbulbs.bulbs.Length);
-            for (int i = 1, n = i*i; i <= people; i++) {
-                n += 2*i + 1;
-                lightbulbs.bulbs[n] = true;
+            for (int i = 1, n = i*i; i <= people && n <= numOfLightbulbs; n+=2*i+1, i++) {
+                lightbulbs.bulbs[n-1] = true;
             }
             lightbulbs.bulbsOn = lightbulbs.bulbs.Count( lb => lb ); //Sets the number of bulbs that are true / switched on;
         }

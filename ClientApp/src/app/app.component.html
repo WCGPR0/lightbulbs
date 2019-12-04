@@ -17,7 +17,7 @@
           <h2>There are {{ lightbulb.bulbsOn }} light bulbs that are lit!</h2>
           <ul>
             <li *ngFor="let lightbulb of getOpenBulbs()">
-              {{ lightbulb }}
+              {{ lightbulb + 1 }}
             </li>
           </ul>
       </div>
