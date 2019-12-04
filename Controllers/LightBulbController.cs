@@ -44,9 +44,14 @@ namespace lightbulbs.Controllers
         */
         private Lightbulbs MakeLightbulbs(int numOfLightbulbs, int people) {
             Lightbulbs lightbulbs = new Lightbulbs(numOfLightbulbs);
-            AdjustLightbulbs(ref lightbulbs, people);
+            if (numOfLightbulbs == people) //Constraint for smart optimized approach
+                AdjustLightbulbsOptimized(ref lightbulbs, people);
+            else
+                AdjustLightbulbs(ref lightbulbs, people);
             return lightbulbs;
         }
+
+        /** Standard Brute Force Approach */
         private void AdjustLightbulbs(ref Lightbulbs lightbulbs, int people, int start = 1) {
             int numOfLightbulbs = lightbulbs.bulbs.Count();
             for (int i = start; i <= people; i++) {
@@ -55,6 +60,17 @@ namespace lightbulbs.Controllers
                     lightbulbs.bulbs[people_] ^= true;
                     people_ += i;
                 }
+            }
+            lightbulbs.bulbsOn = lightbulbs.bulbs.Count( lb => lb ); //Sets the number of bulbs that are true / switched on;
+        }
+
+        /** Optimized Square Numbers Approach */
+        private void AdjustLightbulbsOptimized(ref Lightbulbs lightbulbs, int people) {
+            int numOfLightbulbs = lightbulbs.bulbs.Count();
+            Array.Clear(lightbulbs.bulbs, 0, lightbulbs.bulbs.Length);
+            for (int i = 1, n = i*i; i <= people; i++) {
+                n += 2*i + 1;
+                lightbulbs.bulbs[n] = true;
             }
             lightbulbs.bulbsOn = lightbulbs.bulbs.Count( lb => lb ); //Sets the number of bulbs that are true / switched on;
         }

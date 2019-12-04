@@ -13,6 +13,7 @@ export class AppComponent {
   lightbulb: Lightbulb;
   numOfLightbulbs: number = 100;
   people: number = 100;
+  option: number = 0;
 
   constructor(private lightbulbService: LightbulbService) { }
   OnBlurMethod() {
