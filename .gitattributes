@@ -1,2 +1,3 @@
-*.js linguist-language=Angular
-*.cs linguist-language=C#
+* linguist-vendored
+*.js linguist-language=Angular linguist-vendored=false
+*.cs linguist-language=C# linguist-vendored=false
