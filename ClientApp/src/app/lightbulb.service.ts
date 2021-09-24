@@ -9,7 +9,7 @@ import { Lightbulb } from './lightbulb.model';
   providedIn: 'root'
 })
 export class LightbulbService {
-  url = 'https://localhost:5001/api/LightBulb/GetLightBulbs';
+  url = '/api/LightBulb/GetLightBulbs';
   constructor(private http: HttpClient) { }
 
   getLightBulbs(numOfLightbulbs: number, people: number): Observable<Lightbulb> {
